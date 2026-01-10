@@ -1,0 +1,26 @@
+1. 保存并提交download.yml文件.
+
+2. 点击仓库顶部的 Actions 标签。
+
+3. 在左侧点击 "Download Docker Image to File"。
+
+4. 点击右侧的 Run workflow 按钮。
+
+5. 在输入框里确认是 pgvector/pgvector:pg16-v0.8.1。
+
+6. 点击绿色 Run workflow 按钮。
+
+等待约 1-2 分钟，当圆圈变成绿色对钩后：
+
+7. 点击这次运行记录进去。
+
+8. 滚动到最下方的 Artifacts 区域。
+
+9. 点击 docker-image-artifact。
+   GitHub 会直接让你的浏览器下载一个 .zip 文件。
+
+10. 解压这个 zip，你会得到 image.tar。把它传到你的 Linux 服务器，加载即可
+```
+docker load -i image.tar
+```
+  
