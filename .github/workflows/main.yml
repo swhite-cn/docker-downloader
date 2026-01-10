@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       image_name:
-        description: 'Image Name (e.g. pgvector/pgvector:pg16-v0.8.1)'
+        description: 'Image Name (e.g. pgvector/pgvector:pg16)'
         required: true
-        default: 'pgvector/pgvector:pg16-v0.8.1'
+        default: 'pgvector/pgvector:pg16'
 
 jobs:
   download:
