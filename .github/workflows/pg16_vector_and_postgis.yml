@@ -1,0 +1,58 @@
+name: Build PG16 with Vector and PostGIS
+
+on:
+  workflow_dispatch: # 允许手动点击按钮触发
+
+jobs:
+  build-and-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (Not strictly needed but good practice)
+        uses: actions/checkout@v4
+
+      # 1. 现场生成 Dockerfile
+      # 我们直接用脚本把 Dockerfile 内容写入文件，这样你就不需要先在仓库里提交一个 Dockerfile 了
+      - name: Create Dockerfile
+        run: |
+          cat <<EOF > Dockerfile
+          # 基于官方 pgvector 镜像 (包含 PG16 和 pgvector 0.8.x)
+          FROM pgvector/pgvector:pg16
+          
+          # 切换到 root 用户以安装软件
+          USER root
+          
+          # 更新源并安装 PostGIS 3 (适配 PG16)
+          # 清理缓存以减小体积
+          RUN apt-get update && \\
+              apt-get install -y postgresql-16-postgis-3 postgresql-16-postgis-3-scripts && \\
+              rm -rf /var/lib/apt/lists/*
+          
+          # (可选) 切回默认的 postgres 用户，或者保持 root 让 entrypoint 处理
+          # 官方镜像通常建议保持 docker-entrypoint 的默认行为
+          EOF
+
+      # 2. 执行 Docker Build
+      - name: Build Docker Image
+        run: |
+          docker build -t pg16-vector-gis:latest .
+
+      # 3. 验证一下安装是否成功 (打印版本信息)
+      - name: Verify Extensions
+        run: |
+          # 启动一个临时容器，检查 pgvector 和 postgis 是否都在扩展列表中
+          docker run --rm pg16-vector-gis:latest \
+          bash -c "ls /usr/share/postgresql/16/extension/vector.control && ls /usr/share/postgresql/16/extension/postgis.control"
+          echo "✅ 验证通过：Vector 和 PostGIS 控制文件均存在"
+
+      # 4. 导出为 Tar 包
+      - name: Save Image to Tar
+        run: |
+          docker save -o pg16_vector_gis.tar pg16-vector-gis:latest
+
+      # 5. 上传 Artifact (供你在网页下载)
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pg16-vector-gis-image
+          path: pg16_vector_gis.tar
+          retention-days: 1
