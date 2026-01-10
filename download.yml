@@ -1,0 +1,26 @@
+name: Download Docker Image to File
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_name:
+        description: 'Image Name (e.g. pgvector/pgvector:pg16-v0.8.1)'
+        required: true
+        default: 'pgvector/pgvector:pg16-v0.8.1'
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull Docker Image
+        run: docker pull ${{ inputs.image_name }}
+
+      - name: Save Image to Tar
+        run: docker save -o image.tar ${{ inputs.image_name }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-artifact
+          path: image.tar
+          retention-days: 1
