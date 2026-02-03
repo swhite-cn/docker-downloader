@@ -1,0 +1,27 @@
+name: Download Dify Sandbox Image
+
+on:
+  workflow_dispatch: # 允许手动点击运行
+
+jobs:
+  download-image:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Pull Dify Sandbox Image
+        run: |
+          # 拉取最新的镜像
+          docker pull langgenius/dify-sandbox:latest
+          
+          # 将镜像保存为 tar 文件
+          docker save langgenius/dify-sandbox:latest -o dify-sandbox-latest.tar
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dify-sandbox-image
+          path: dify-sandbox-latest.tar
+          retention-days: 5 # 产物保存5天
