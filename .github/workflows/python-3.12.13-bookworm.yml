@@ -1,4 +1,4 @@
-name: Download Dify Sandbox Image
+name: Download python-3.12.13-bookworm Image
 
 on:
   workflow_dispatch: # 允许手动点击运行
