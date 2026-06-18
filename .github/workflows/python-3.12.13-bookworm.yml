@@ -1,0 +1,26 @@
+name: Download Dify Sandbox Image
+
+on:
+  workflow_dispatch: # 允许手动点击运行
+
+jobs:
+  download-image:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Pull python3.12.13 Sandbox Image
+        run: |
+          # 拉取最新的镜像
+          docker pull python:3.12.13-bookworm
+          
+          # 将镜像保存为 tar 文件
+          docker save python:3.12.13-bookworm -o python:3.12.13-bookworm.tar
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-3.12.13-bookworm
+          path: python:3.12.13-bookworm.tar
+          retention-days: 5 # 产物保存5天
